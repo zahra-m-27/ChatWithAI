@@ -31,14 +31,14 @@ function App() {
         },
       });
       const data = await response.json();
-      console.log(response.status);
-      if (response.status == 200) {
-        const aiMessage = { role: "assistant", content: data.reply };
-        setChats((prev) => [...prev, aiMessage]);
-      } else if (response.status == 400 || response.status == 500) {
-        const aiMessage = { role: "assistant", content: data.error };
-        setChats((prev) => [...prev, aiMessage]);
-      }
+      let content = "";
+
+      if (response.status == 200) content = data.reply;
+      else if (response.status == 400 || response.status == 500)
+        content = data.error;
+
+      const aiMessage = { role: "assistant", content };
+      setChats((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -54,7 +54,7 @@ function App() {
             className={`chat-message ${chat.role}`}
             ref={index === chats.length - 1 ? lastMessageRef : null}
           >
-            <strong>{chat.role === "user" ? "You" : "AI"}:</strong>{" "}
+            <strong>{chat.role === "user" ? "You" : "AI"}:</strong>
             {chat.content}
           </div>
         ))}
