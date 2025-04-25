@@ -4,7 +4,11 @@ const cors = require("cors");
 const app = express();
 require("dotenv").config();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // Replace with your frontend URL
+  })
+);
 app.use(express.json()); // Use built-in middleware to parse JSON
 
 const client = new GoogleGenAI({
@@ -31,6 +35,7 @@ app.post("/chat", async (req, res) => {
   }
 });
 
+const PORT = process.env.PORT || 8000;
 app.listen(process.env.PORT, () => {
-  console.log(`Server running on http://localhost:${process.env.PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
