@@ -5,6 +5,10 @@ function App() {
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
   const lastMessageRef = useRef(null);
+  const baseURL =
+    import.meta.env.MODE == "development"
+      ? "http://localhost:8000/"
+      : import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     if (lastMessageRef.current) {
@@ -23,7 +27,7 @@ function App() {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:8000/chat", {
+      const response = await fetch(`${baseURL}chat`, {
         method: "POST",
         body: JSON.stringify({ message: message }),
         headers: {
