@@ -6,7 +6,7 @@ require("dotenv").config();
 
 app.use(
   cors({
-    origin: "*", // Replace with your frontend URL
+    origin: "https://chat-with-ai-s71j.onrender.com",
   })
 );
 app.use(express.json()); // Use built-in middleware to parse JSON
