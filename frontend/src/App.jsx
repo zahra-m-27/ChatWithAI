@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
+  const [currentSessionId, setCurrentSessionId] = useState(null);
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
   const lastMessageRef = useRef(null);
@@ -26,14 +27,36 @@ function App() {
     setChats((prev) => [...prev, userMessage]);
     setMessage("");
 
-    try {
+    if (!currentSessionId) {
       const response = await fetch(`${baseURL}chat`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: message }),
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
+      const data = await response.json();
+
+      setCurrentSessionId(data.sessionId);
+      console.log(`current session id in first req: ${currentSessionId}`);
+
+      let content = "";
+
+      if (response.status == 200) content = data.reply;
+      else if (response.status == 400 || response.status == 500)
+        content = data.error;
+
+      const aiMessage = { role: "assistant", content };
+      setChats((prev) => [...prev, aiMessage]);
+    } else {
+      const response = await fetch(`${baseURL}chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: message,
+          clientSessionId: currentSessionId,
+        }),
+      });
+      console.log(`sent session id in other req: ${currentSessionId}`);
+
       const data = await response.json();
       let content = "";
 
@@ -43,8 +66,6 @@ function App() {
 
       const aiMessage = { role: "assistant", content };
       setChats((prev) => [...prev, aiMessage]);
-    } catch (error) {
-      console.error("Error sending message:", error);
     }
   };
 
